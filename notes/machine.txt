@@ -1,0 +1,4 @@
+OS: Windows 11 Home Single Language, version 25H2
+CPU: 11th Gen Intel Core i5-1135G7 @ 2.40GHz
+RAM: 8 GB (7.8 GB available)
+GPU: Intel Iris Xe Graphics
