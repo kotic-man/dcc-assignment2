@@ -1,0 +1,5 @@
+﻿[client-1] SEND   Increment(counter=likes:post-42, delta=1)      L=1
+[client-1] RECV   IncrementReply(new_value=1)                    L=5  (received L=4)
+[replica-A] RECV   Increment(counter=likes:post-42, delta=1)      L=2  (received L=1)
+[replica-A] APPLY  counter=likes:post-42 -> 1                     L=3
+[replica-A] SEND   IncrementReply(new_value=1)                    L=4

@@ -1,0 +1,16 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.13.2, pytest-9.1.1, pluggy-1.6.0 -- C:\Users\Dauren1\Desktop\dcc-assignment2\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\Dauren1\Desktop\dcc-assignment2
+configfile: pytest.ini
+collecting ... collected 7 items
+
+tests/test_clocks.py::test_local_event_increments_clock PASSED           [ 14%]
+tests/test_clocks.py::test_receive_takes_max_plus_one PASSED             [ 28%]
+tests/test_clocks.py::test_receive_with_smaller_value_still_increments PASSED [ 42%]
+tests/test_counter.py::test_increment_applies_delta PASSED               [ 57%]
+tests/test_counter.py::test_duplicate_key_not_reapplied PASSED           [ 71%]
+tests/test_counter.py::test_get_missing_counter PASSED                   [ 85%]
+tests/test_counter.py::test_concurrent_increments_exact PASSED           [100%]
+
+============================== 7 passed in 0.93s ==============================
