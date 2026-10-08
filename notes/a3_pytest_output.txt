@@ -1,0 +1,13 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.13.2, pytest-9.1.1, pluggy-1.6.0 -- C:\Users\Dauren1\Desktop\dcc-assignment2\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\Dauren1\Desktop\dcc-assignment2
+configfile: pytest.ini
+collecting ... collected 4 items
+
+tests/test_counter.py::test_increment_applies_delta PASSED               [ 25%]
+tests/test_counter.py::test_duplicate_key_not_reapplied PASSED           [ 50%]
+tests/test_counter.py::test_get_missing_counter PASSED                   [ 75%]
+tests/test_counter.py::test_concurrent_increments_exact PASSED           [100%]
+
+============================== 4 passed in 1.56s ==============================
