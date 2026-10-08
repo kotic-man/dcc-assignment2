@@ -1,0 +1,12 @@
+python client.py incr likes:post-42 --by 5
+OK committed value=5 (duplicate: no)
+python client.py get likes:post-42
+value=5
+python client.py incr likes:post-42 --by 5 --key abc
+OK committed value=10 (duplicate: no)
+python client.py incr likes:post-42 --by 5 --key abc
+OK committed value=10 (duplicate: yes)
+python client.py get likes:post-42
+value=10
+python client.py get no-such-counter
+not found
