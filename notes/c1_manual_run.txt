@@ -1,0 +1,43 @@
+test1
+(.venv) PS C:\Users\Dauren1\Desktop\dcc-assignment2>python client.py --targets localhost:50051,localhost:50052,localhost:50053 incr likes:post-42 --by 1
+[client] SEND   Increment(counter=likes:post-42, delta=1)      L=1
+[client] SEND   Increment(counter=likes:post-42, delta=1)      L=2
+[client] SEND   Increment(counter=likes:post-42, delta=1)      L=3
+[client] RECV   IncrementReply(new_value=1)                    L=6  (received L=5)
+[client] RECV   IncrementReply(new_value=1)                    L=7  (received L=4)
+[client] RECV   IncrementReply(new_value=1)                    L=8  (received L=6)
+OK committed value=1 (acks: 3/3)
+(.venv) PS C:\Users\Dauren1\Desktop\dcc-assignment2>python client.py --targets localhost:50051,localhost:50052,localhost:50053 get likes:post-42
+[client] SEND   Get(counter=likes:post-42)                     L=1
+[client] RECV   GetReply(value=1, found=True)                  L=7  (received L=6)
+value=1 
+
+test2
+python client.py --targets localhost:50051,localhost:50052,localhost:50053 incr likes:post-42 --by 1
+[client] SEND   Increment(counter=likes:post-42, delta=1)      L=1
+[client] SEND   Increment(counter=likes:post-42, delta=1)      L=2
+[client] SEND   Increment(counter=likes:post-42, delta=1)      L=3
+[client] RECV   IncrementReply(new_value=1)                    L=5  (received L=4)
+[client] RECV   IncrementReply(new_value=1)                    L=6  (received L=5)
+[client] SEND   Increment(counter=likes:post-42, delta=1)      L=7
+[client] SEND   Increment(counter=likes:post-42, delta=1)      L=8
+[client] SEND   Increment(counter=likes:post-42, delta=1)      L=9
+OK committed value=1 (acks: 2/3)
+
+test3
+(.venv) PS C:\Users\Dauren1\Desktop\dcc-assignment2> python client.py --targets localhost:50051,localhost:50052,localhost:50053 incr likes:post-42 --by 1
+[client] SEND   Increment(counter=likes:post-42, delta=1)      L=1
+[client] SEND   Increment(counter=likes:post-42, delta=1)      L=2
+[client] SEND   Increment(counter=likes:post-42, delta=1)      L=3
+[client] RECV   IncrementReply(new_value=1)                    L=5  (received L=4)
+[client] SEND   Increment(counter=likes:post-42, delta=1)      L=6
+[client] SEND   Increment(counter=likes:post-42, delta=1)      L=7
+[client] SEND   Increment(counter=likes:post-42, delta=1)      L=8
+[client] SEND   Increment(counter=likes:post-42, delta=1)      L=9
+[client] SEND   Increment(counter=likes:post-42, delta=1)      L=10
+[client] SEND   Increment(counter=likes:post-42, delta=1)      L=11
+FAILED: quorum not reached (1/3 acks)
+(.venv) PS C:\Users\Dauren1\Desktop\dcc-assignment2> python client.py --target localhost:50051 get likes:post-42
+[client] SEND   Get(counter=likes:post-42)                     L=1
+[client] RECV   GetReply(value=1, found=True)                  L=7  (received L=6)
+value=1
