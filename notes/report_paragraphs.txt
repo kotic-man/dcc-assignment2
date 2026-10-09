@@ -17,3 +17,8 @@ If the client reports a failed write because only one replica acknowledged it, t
 
 [C1] Read consistency risk
 Get reads from a single replica, so it can return a stale value if that replica missed a write (for example because it was down or slow). Reads are therefore not guaranteed to reflect the latest committed write.
+
+[C3] Failure-injection results
+Scenario 1: replica crash mid-request. Fault: replica crash-C is started with --fault crash-after-recv and terminates its own process when the first Increment arrives (real process death, deterministic trigger). Invariant: the client commits with 2 of 3 acks, no exception reaches the caller, both surviving replicas hold x=1, and the crashed process has exited. Evidence: test_replica_crash_mid_request_still_commits; logs/failures/crash-C.log contains the RECV line and no APPLY or SEND.
+Scenario 2: request duplication. Fault: the same idempotency key is sent twice through the quorum client and once more directly to each replica. Invariant: the value stays 5 (not 10) everywhere and the direct resend returns was_duplicate = true. Evidence: test_duplicate_request_moves_value_once; DEDUP lines in logs/failures/dup-A.log.
+Scenario 3: induced timeout with retry. Fault: replica timeout-A is started with --fault slow-first --delay-ms 1500, the client deadline is 0.5 s. Invariant: the first attempt hits DEADLINE_EXCEEDED, the retry with the same key succeeds (new_value = 1), and the delayed original request is later recognised as a duplicate, so the counter moved exactly once. Evidence: test_induced_timeout_retry_moves_exactly_once; logs/failures/timeout-A.log shows RECV, RECV, APPLY, SEND, DEDUP, SEND.
