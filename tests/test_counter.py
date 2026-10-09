@@ -1,8 +1,10 @@
 import threading
+import time
 
+import grpc
 import pytest
 
-from client import CounterClient
+from client import CounterClient, QuorumError, ReplicatedCounterClient
 from server import start_server
 
 
@@ -29,6 +31,53 @@ def running_server():
     rs = RunningServer()
     yield rs
     rs.stop()
+
+
+class ReplicaGroup:
+    """Три независимые реплики на свободных портах."""
+
+    def __init__(self, n=3):
+        self.servers, self.ports = [], []
+        self._stopped = set()
+        self._clients = []
+        for i in range(n):
+            server, port = start_server(port=0, name=f"replica-{'ABCDE'[i]}")
+            self.servers.append(server)
+            self.ports.append(port)
+
+    @property
+    def targets(self):
+        return [f"localhost:{p}" for p in self.ports]
+
+    def new_client(self):
+        # короткие паузы между повторами, чтобы тесты шли быстро
+        c = ReplicatedCounterClient(self.targets, timeout=1.0, backoffs=(0.05, 0.05))
+        self._clients.append(c)
+        return c
+
+    def direct_client(self, i):
+        """Клиент, который говорит только с одной конкретной репликой."""
+        c = CounterClient(self.targets[i], timeout=1.0)
+        self._clients.append(c)
+        return c
+
+    def stop_replica(self, i):
+        if i not in self._stopped:
+            self.servers[i].stop(0)
+            self._stopped.add(i)
+
+    def stop(self):
+        for c in self._clients:
+            c.close()
+        for i in range(len(self.servers)):
+            self.stop_replica(i)
+
+
+@pytest.fixture
+def replicas():
+    group = ReplicaGroup(3)
+    yield group
+    group.stop()
 
 
 def test_increment_applies_delta(running_server):
@@ -74,3 +123,58 @@ def test_concurrent_increments_exact(running_server):
 
     assert not errors
     assert running_server.new_client().get("shared").value == 2 * PER_THREAD
+
+
+def test_retry_after_timeout_is_safe():
+    # arrange: сервер отвечает медленнее, чем дедлайн клиента
+    rs = RunningServer(delay_ms=300)
+    try:
+        impatient = rs.new_client(timeout=0.1, backoffs=())    # без внутренних повторов
+        # act 1: первая попытка заканчивается таймаутом (клиент не знает, применился ли запрос)
+        with pytest.raises(grpc.RpcError) as exc:
+            impatient.incr("x", 1, key="k-timeout")
+        assert exc.value.code() == grpc.StatusCode.DEADLINE_EXCEEDED
+        time.sleep(0.6)    # сервер дорабатывает первый запрос, хотя клиент ушёл
+        # act 2: повтор с ТЕМ ЖЕ ключом и нормальным дедлайном
+        patient = rs.new_client(timeout=3.0)
+        retry = patient.incr("x", 1, key="k-timeout")
+        # assert: счётчик сдвинулся ровно один раз
+        assert retry.was_duplicate is True
+        assert retry.new_value == 1
+        assert patient.get("x").value == 1
+    finally:
+        rs.stop()
+
+
+def test_majority_commit_two_acks(replicas):
+    client = replicas.new_client()                       # arrange
+    replicas.stop_replica(2)                             # одна реплика упала
+    result = client.incr("x", 1)                         # act
+    assert result.acks == 2                              # assert: 2 из 3 = большинство
+    assert result.total == 3
+    assert result.new_value == 1
+
+
+def test_no_commit_below_majority(replicas):
+    client = replicas.new_client()
+    replicas.stop_replica(1)                             # упали две из трёх
+    replicas.stop_replica(2)
+    with pytest.raises(QuorumError):                     # клиент честно сообщает об ошибке
+        client.incr("x", 1)
+    # выжившая реплика запись всё же применила (частично применённая запись)
+    assert replicas.direct_client(0).get("x").value == 1
+
+
+def test_replicas_converge(replicas):
+    client = replicas.new_client()
+    for i in range(10):                                  # 10 записей при трёх живых репликах
+        client.incr("a" if i % 2 == 0 else "b", 1)
+    replicas.stop_replica(2)                             # одна реплика падает
+    for i in range(10, 15):                              # ещё 5 записей при двух живых
+        client.incr("a" if i % 2 == 0 else "b", 1)
+
+    # живые реплики 0 и 1 идентичны: a получил 8 записей, b получил 7
+    for idx in (0, 1):
+        direct = replicas.direct_client(idx)
+        assert direct.get("a").value == 8
+        assert direct.get("b").value == 7
