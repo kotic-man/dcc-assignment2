@@ -89,10 +89,12 @@ if __name__ == "__main__":
     parser.add_argument("--fault", choices=FAULTS, default="none")
     parser.add_argument("--name", default="replica")
     parser.add_argument("--log", default=None, help="файл для лога событий")
+    parser.add_argument("--quiet", action="store_true",
+                        help="не печатать события в консоль")
     args = parser.parse_args()
 
     server, port = start_server(args.port, args.delay_ms, args.name, args.log,
-                                echo=True, fault=args.fault)
+                                echo=not args.quiet, fault=args.fault)
     print(f"{args.name} listening on port {port}", flush=True)
     try:
         server.wait_for_termination()
