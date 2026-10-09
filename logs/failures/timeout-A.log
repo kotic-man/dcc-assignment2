@@ -1,0 +1,8 @@
+[timeout-A] RECV   Increment(counter=x, delta=1)                  L=2  (received L=1)
+[timeout-A] RECV   Increment(counter=x, delta=1)                  L=3  (received L=2)
+[timeout-A] APPLY  counter=x -> 1                                 L=4
+[timeout-A] SEND   IncrementReply(new_value=1)                    L=5
+[timeout-A] DEDUP  counter=x stays 1                              L=6
+[timeout-A] SEND   IncrementReply(new_value=1)                    L=7
+[timeout-A] RECV   Get(counter=x)                                 L=8  (received L=7)
+[timeout-A] SEND   GetReply(value=1, found=True)                  L=9

@@ -1,0 +1,23 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.13.2, pytest-9.1.1, pluggy-1.6.0 -- C:\Users\Dauren1\Desktop\dcc-assignment2\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\Dauren1\Desktop\dcc-assignment2
+configfile: pytest.ini
+collecting ... collected 14 items
+
+tests/test_clocks.py::test_local_event_increments_clock PASSED           [  7%]
+tests/test_clocks.py::test_receive_takes_max_plus_one PASSED             [ 14%]
+tests/test_clocks.py::test_receive_with_smaller_value_still_increments PASSED [ 21%]
+tests/test_counter.py::test_increment_applies_delta PASSED               [ 28%]
+tests/test_counter.py::test_duplicate_key_not_reapplied PASSED           [ 35%]
+tests/test_counter.py::test_get_missing_counter PASSED                   [ 42%]
+tests/test_counter.py::test_concurrent_increments_exact PASSED           [ 50%]
+tests/test_counter.py::test_retry_after_timeout_is_safe PASSED           [ 57%]
+tests/test_counter.py::test_majority_commit_two_acks PASSED              [ 64%]
+tests/test_counter.py::test_no_commit_below_majority PASSED              [ 71%]
+tests/test_counter.py::test_replicas_converge PASSED                     [ 78%]
+tests/test_failures.py::test_replica_crash_mid_request_still_commits PASSED [ 85%]
+tests/test_failures.py::test_duplicate_request_moves_value_once PASSED   [ 92%]
+tests/test_failures.py::test_induced_timeout_retry_moves_exactly_once PASSED [100%]
+
+============================= 14 passed in 17.59s =============================

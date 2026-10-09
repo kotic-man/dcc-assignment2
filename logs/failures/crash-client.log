@@ -1,0 +1,7 @@
+[crash-client] SEND   Increment(counter=x, delta=1)                  L=1
+[crash-client] SEND   Increment(counter=x, delta=1)                  L=2
+[crash-client] SEND   Increment(counter=x, delta=1)                  L=3
+[crash-client] RECV   IncrementReply(new_value=1)                    L=5  (received L=4)
+[crash-client] RECV   IncrementReply(new_value=1)                    L=6  (received L=5)
+[crash-client] SEND   Increment(counter=x, delta=1)                  L=7
+[crash-client] SEND   Increment(counter=x, delta=1)                  L=8

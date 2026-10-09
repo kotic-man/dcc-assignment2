@@ -1,0 +1,5 @@
+[crash-B] RECV   Increment(counter=x, delta=1)                  L=3  (received L=2)
+[crash-B] APPLY  counter=x -> 1                                 L=4
+[crash-B] SEND   IncrementReply(new_value=1)                    L=5
+[crash-B] RECV   Get(counter=x)                                 L=6  (received L=1)
+[crash-B] SEND   GetReply(value=1, found=True)                  L=7

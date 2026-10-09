@@ -1,0 +1,11 @@
+[dup-A] RECV   Increment(counter=x, delta=5)                  L=2  (received L=1)
+[dup-A] APPLY  counter=x -> 5                                 L=3
+[dup-A] SEND   IncrementReply(new_value=5)                    L=4
+[dup-A] RECV   Increment(counter=x, delta=5)                  L=10  (received L=9)
+[dup-A] DEDUP  counter=x stays 5                              L=11
+[dup-A] SEND   IncrementReply(new_value=5)                    L=12
+[dup-A] RECV   Increment(counter=x, delta=5)                  L=13  (received L=1)
+[dup-A] DEDUP  counter=x stays 5                              L=14
+[dup-A] SEND   IncrementReply(new_value=5)                    L=15
+[dup-A] RECV   Get(counter=x)                                 L=18  (received L=17)
+[dup-A] SEND   GetReply(value=5, found=True)                  L=19

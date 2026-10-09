@@ -1,0 +1,5 @@
+[timeout-client] SEND   Increment(counter=x, delta=1)                  L=1
+[timeout-client] SEND   Increment(counter=x, delta=1)                  L=2
+[timeout-client] RECV   IncrementReply(new_value=1)                    L=6  (received L=5)
+[timeout-client] SEND   Get(counter=x)                                 L=7
+[timeout-client] RECV   GetReply(value=1, found=True)                  L=10  (received L=9)
